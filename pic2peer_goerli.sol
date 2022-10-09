@@ -28,6 +28,7 @@ interface OptimisticOracleV2Interface {
         uint256 reward; // Amount of the currency to pay to the proposer on settlement.
         uint256 finalFee; // Final fee to pay to the Store upon request to the DVM.
     }
+    
     function requestPrice(bytes32 identifier, uint256 timestamp, bytes memory ancillaryData, IERC20 currency, uint256 reward) external returns (uint256 totalBond);
     function proposePrice(address requester, bytes32 identifier, uint256 timestamp, bytes memory ancillaryData, int256 proposedPrice) external returns (uint256 totalBond);
     function setCustomLiveness(bytes32 identifier, uint256 timestamp, bytes memory ancillaryData, uint256 customLiveness) external;
@@ -46,7 +47,7 @@ contract pic2peer {
     IERC721 token;
     
     // oracle related variables
-    OptimisticOracleV2Interface oo = OptimisticOracleV2Interface(0xA5B9d8a0B0Fa04Ba71BDD68069661ED5C0848884);
+    OptimisticOracleV2Interface oo = OptimisticOracleV2Interface(0xA5B9d8a0B0Fa04Ba71BDD68069661ED5C0848884); // Goerli
     bytes32 identifier = bytes32("YES_OR_NO_QUERY");
 
     // struct for identifying transactions
@@ -132,6 +133,7 @@ contract pic2peer {
 
     function release_enefti(string calldata assertion, uint256 requestTime, uint256 _item) public {
         bytes memory ancillaryData = bytes(assertion);
+        oo.settle(address(this), identifier, requestTime, ancillaryData);
         int256 answer = 0;
         answer = oo.getRequest(address(this), identifier, requestTime, ancillaryData).resolvedPrice;
 
